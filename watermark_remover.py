@@ -137,7 +137,12 @@ def gpu_worker_process(gpu_id: int, image_paths: list, write_queue: mp.Queue, st
     from simple_lama_inpainting import SimpleLama
     from PIL import Image
     try:
-        device = torch.device("cuda:0"); yolo_model = YOLO(args.weights).to(device); lama_model = SimpleLama(device=device)
+       import torch
+
+device = torch.device("mps") if torch.backends.mps.is_available() else torch.device("cpu")
+yolo_model = YOLO(args.weights).to(device)
+lama_model = SimpleLama(device=device)
+
     except Exception as e:
         status_queue.put({"type": "error", "message": f"GPU {gpu_id} failed to init: {e}"}); return
 
